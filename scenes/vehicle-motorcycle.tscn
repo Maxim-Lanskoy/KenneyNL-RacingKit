@@ -1,18 +1,18 @@
-[gd_scene load_steps=16 format=3 uid="uid://badoy1c127yhf"]
+[gd_scene format=3 uid="uid://cxotjqn50aokg"]
 
-[ext_resource type="Script" uid="uid://bqite16pastgo" path="res://scripts/vehicle.gd" id="1_6gcpt"]
-[ext_resource type="PackedScene" uid="uid://bynb5jk1d478y" path="res://models/vehicle-truck-yellow.glb" id="2_e2g1l"]
-[ext_resource type="Texture2D" uid="uid://c026qrhqxgw3n" path="res://sprites/smoke.png" id="3_vuxys"]
-[ext_resource type="AudioStream" uid="uid://2in1jtv5bh0y" path="res://audio/skid.ogg" id="4_p2hth"]
-[ext_resource type="AudioStream" uid="uid://j6x2is8pyt8y" path="res://audio/engine.ogg" id="5_mcce1"]
-[ext_resource type="AudioStream" uid="uid://io4pmr3lo1dy" path="res://audio/impact.ogg" id="6_v3p7b"]
+[ext_resource type="Script" uid="uid://dicg0lx722won" path="res://scripts/vehicle-motorcycle.gd" id="1_deusc"]
+[ext_resource type="PackedScene" uid="uid://cd4a6ymdn58xu" path="res://models/vehicle-motorcycle.glb" id="2_deusc"]
+[ext_resource type="Texture2D" uid="uid://c026qrhqxgw3n" path="res://sprites/smoke.png" id="3_5e6it"]
+[ext_resource type="AudioStream" uid="uid://2in1jtv5bh0y" path="res://audio/skid.ogg" id="4_moxos"]
+[ext_resource type="AudioStream" uid="uid://oentynl734ox" path="res://audio/engine-motorcycle.ogg" id="5_deusc"]
+[ext_resource type="AudioStream" uid="uid://io4pmr3lo1dy" path="res://audio/impact.ogg" id="6_mll1c"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_tfk12"]
 transparency = 1
 depth_draw_mode = 2
 shading_mode = 0
 vertex_color_use_as_albedo = true
-albedo_texture = ExtResource("3_vuxys")
+albedo_texture = ExtResource("3_5e6it")
 disable_receive_shadows = true
 billboard_mode = 3
 billboard_keep_scale = true
@@ -31,7 +31,8 @@ point_count = 3
 curve = SubResource("Curve_t02a3")
 
 [sub_resource type="Curve" id="Curve_bncg7"]
-_data = [Vector2(0, 0.5), 0.0, 0.0, 0, 0, Vector2(0.5, 1), 0.0, 0.0, 0, 0, Vector2(1, 0.2), 0.5, 0.0, 0, 0]
+_limits = [0.0, 1.5, 0.0, 1.0]
+_data = [Vector2(0, 0.5), 0.0, 0.0, 0, 0, Vector2(0.49593493, 1.5), 0.0, 0.0, 0, 0, Vector2(1, 0.2), 0.5, 0.0, 0, 0]
 point_count = 3
 
 [sub_resource type="CurveTexture" id="CurveTexture_5pp1o"]
@@ -57,18 +58,12 @@ rough = true
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_hhncp"]
 
-[node name="Vehicle" type="Node3D" unique_id=1867641805 node_paths=PackedStringArray("sphere", "raycast", "vehicle_model", "vehicle_body", "wheel_fl", "wheel_fr", "wheel_bl", "wheel_br", "trail_left", "trail_right", "screech_sound", "engine_sound", "impact_sound")]
-script = ExtResource("1_6gcpt")
+[node name="Vehicle" type="Node3D" unique_id=1867641805 node_paths=PackedStringArray("sphere", "raycast", "vehicle_model", "trail_left", "screech_sound", "engine_sound", "impact_sound")]
+script = ExtResource("1_deusc")
 sphere = NodePath("Sphere")
 raycast = NodePath("Ground")
 vehicle_model = NodePath("Container")
-vehicle_body = NodePath("Container/Model/body")
-wheel_fl = NodePath("Container/Model/wheel-front-left")
-wheel_fr = NodePath("Container/Model/wheel-front-right")
-wheel_bl = NodePath("Container/Model/wheel-back-left")
-wheel_br = NodePath("Container/Model/wheel-back-right")
 trail_left = NodePath("Container/TrailLeft")
-trail_right = NodePath("Container/TrailRight")
 screech_sound = NodePath("Container/ScreechSound")
 engine_sound = NodePath("Container/EngineSound")
 impact_sound = NodePath("Container/ImpactSound")
@@ -81,20 +76,10 @@ debug_shape_custom_color = Color(0.898039, 0, 0, 1)
 
 [node name="Container" type="Node3D" parent="." unique_id=546976745]
 
-[node name="Model" parent="Container" unique_id=2133669704 instance=ExtResource("2_e2g1l")]
+[node name="Model" parent="Container" unique_id=1374897151 instance=ExtResource("2_deusc")]
 
 [node name="TrailLeft" type="GPUParticles3D" parent="Container" unique_id=1350774766]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.25, 0.05, -0.35)
-material_override = SubResource("StandardMaterial3D_tfk12")
-cast_shadow = 0
-amount = 32
-lifetime = 0.5
-fixed_fps = 60
-process_material = SubResource("ParticleProcessMaterial_xgt35")
-draw_pass_1 = SubResource("QuadMesh_68fxn")
-
-[node name="TrailRight" type="GPUParticles3D" parent="Container" unique_id=1271178057]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.25, 0.05, -0.35)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, -0.2)
 material_override = SubResource("StandardMaterial3D_tfk12")
 cast_shadow = 0
 amount = 32
@@ -104,15 +89,15 @@ process_material = SubResource("ParticleProcessMaterial_xgt35")
 draw_pass_1 = SubResource("QuadMesh_68fxn")
 
 [node name="ScreechSound" type="AudioStreamPlayer3D" parent="Container" unique_id=1640227385]
-stream = ExtResource("4_p2hth")
+stream = ExtResource("4_moxos")
 autoplay = true
 
 [node name="EngineSound" type="AudioStreamPlayer3D" parent="Container" unique_id=397905471]
-stream = ExtResource("5_mcce1")
+stream = ExtResource("5_deusc")
 autoplay = true
 
 [node name="ImpactSound" type="AudioStreamPlayer3D" parent="Container" unique_id=1542612165]
-stream = ExtResource("6_v3p7b")
+stream = ExtResource("6_mll1c")
 
 [node name="Sphere" type="RigidBody3D" parent="." unique_id=1368519146]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
@@ -129,7 +114,5 @@ angular_damp = 4.0
 
 [node name="CollisionShape" type="CollisionShape3D" parent="Sphere" unique_id=503279956]
 shape = SubResource("SphereShape3D_hhncp")
-
-[editable path="Container/Model"]
 
 [connection signal="body_entered" from="Sphere" to="." method="_on_sphere_body_entered"]

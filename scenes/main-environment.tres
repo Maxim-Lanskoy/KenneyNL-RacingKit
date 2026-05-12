@@ -1,4 +1,4 @@
-[gd_resource type="Environment" load_steps=3 format=3 uid="uid://c3bs0wfxpri8g"]
+[gd_resource type="Environment" format=3 uid="uid://c3bs0wfxpri8g"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_lg8b7"]
 sky_horizon_color = Color(0.67451, 0.682353, 0.698039, 1)
@@ -26,5 +26,4 @@ ssil_intensity = 1.25
 glow_enabled = true
 glow_levels/2 = 0.6
 glow_levels/3 = 0.6
-glow_levels/5 = 0.0
 glow_strength = 1.25

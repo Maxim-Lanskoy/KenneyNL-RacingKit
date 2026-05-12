@@ -1,42 +1,42 @@
-[gd_scene load_steps=9 format=3 uid="uid://clq7nox1juh3a"]
+[gd_scene format=3 uid="uid://clq7nox1juh3a"]
 
 [ext_resource type="Environment" uid="uid://c3bs0wfxpri8g" path="res://scenes/main-environment.tres" id="1_q4t1r"]
-[ext_resource type="PackedScene" uid="uid://badoy1c127yhf" path="res://scenes/vehicle.tscn" id="2_o6xl0"]
 [ext_resource type="Script" uid="uid://b24bstassw26s" path="res://scripts/view.gd" id="5_0lrhn"]
+[ext_resource type="PackedScene" uid="uid://badoy1c127yhf" path="res://scenes/vehicle.tscn" id="7_o6xl0"]
 [ext_resource type="MeshLibrary" uid="uid://b6myd2b7l2o2j" path="res://models/Library/mesh-library.tres" id="8_eg7gk"]
 [ext_resource type="PackedScene" uid="uid://c44tfiddyjjm1" path="res://models/vehicle-truck-green.glb" id="9_cmq2j"]
 [ext_resource type="PackedScene" uid="uid://c5e64mpylh1ge" path="res://models/vehicle-truck-purple.glb" id="10_p3c1o"]
 [ext_resource type="PackedScene" uid="uid://b34e2pvbemfac" path="res://models/vehicle-truck-red.glb" id="11_wocnk"]
 
+[sub_resource type="BoxShape3D" id="BoxShape3D_ya4ey"]
+size = Vector3(60, 0, 60)
+
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_tipki"]
 friction = 0.0
 bounce = 0.1
 
-[node name="Main" type="Node3D"]
+[node name="Main" type="Node3D" unique_id=1145999287]
 
-[node name="Environment" type="WorldEnvironment" parent="."]
+[node name="Environment" type="WorldEnvironment" parent="." unique_id=1097254880]
 environment = ExtResource("1_q4t1r")
 
-[node name="Plane" type="CSGBox3D" parent="."]
-transparency = 1.0
-use_collision = true
-size = Vector3(60, 0, 60)
+[node name="Plane" type="StaticBody3D" parent="." unique_id=697578616]
 
-[node name="Vehicle" parent="." instance=ExtResource("2_o6xl0")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.5, 0, 5)
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Plane" unique_id=1840952651]
+shape = SubResource("BoxShape3D_ya4ey")
 
-[node name="View" type="Node3D" parent="." node_paths=PackedStringArray("target")]
+[node name="View" type="Node3D" parent="." unique_id=1807530472 node_paths=PackedStringArray("target")]
 transform = Transform3D(0.707107, -0.40558, 0.579228, 0, 0.819152, 0.573576, -0.707107, -0.40558, 0.579228, 3.5, 0, 5)
 script = ExtResource("5_0lrhn")
 target = NodePath("../Vehicle")
 
-[node name="Camera" type="Camera3D" parent="View"]
+[node name="Camera" type="Camera3D" parent="View" unique_id=1079798936]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 16)
 current = true
 fov = 40.0
 far = 60.0
 
-[node name="Sun" type="DirectionalLight3D" parent="."]
+[node name="Sun" type="DirectionalLight3D" parent="." unique_id=385873465]
 transform = Transform3D(-0.422618, -0.694272, 0.582564, 0, 0.642788, 0.766044, -0.906308, 0.323744, -0.271654, 0, 0, 0)
 shadow_enabled = true
 shadow_bias = 0.2
@@ -48,7 +48,7 @@ directional_shadow_max_distance = 30.0
 directional_shadow_pancake_size = 2.0
 sky_mode = 1
 
-[node name="GridMap" type="GridMap" parent="."]
+[node name="GridMap" type="GridMap" parent="." unique_id=746223562]
 transform = Transform3D(0.75, 0, 0, 0, 0.75, 0, 0, 0, 0.75, 0, -0.5, 0)
 mesh_library = ExtResource("8_eg7gk")
 physics_material = SubResource("PhysicsMaterial_tipki")
@@ -58,11 +58,14 @@ data = {
 }
 metadata/_editor_floor_ = Vector3(0, 0, 0)
 
-[node name="vehicle-truck-green" parent="." instance=ExtResource("9_cmq2j")]
+[node name="vehicle-truck-green" parent="." unique_id=261795706 instance=ExtResource("9_cmq2j")]
 transform = Transform3D(-0.139916, 0, 0.990163, 0, 1, 0, -0.990163, 0, -0.139916, -3.51261, -0.00957274, 12.7003)
 
-[node name="vehicle-truck-purple" parent="." instance=ExtResource("10_p3c1o")]
+[node name="vehicle-truck-purple" parent="." unique_id=1373203257 instance=ExtResource("10_p3c1o")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -23.7772, -0.143123, -13.5596)
 
-[node name="vehicle-truck-red" parent="." instance=ExtResource("11_wocnk")]
+[node name="vehicle-truck-red" parent="." unique_id=1524379599 instance=ExtResource("11_wocnk")]
 transform = Transform3D(-0.913034, 0, 0.407884, 0, 1, 0, -0.407884, 0, -0.913034, -1.36138, -0.148564, -23.8)
+
+[node name="Vehicle" parent="." unique_id=1867641805 instance=ExtResource("7_o6xl0")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.5, 0, 5)
