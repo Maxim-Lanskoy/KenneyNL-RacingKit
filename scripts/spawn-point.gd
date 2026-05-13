@@ -13,7 +13,10 @@ var _spawned: Vehicle
 
 func _ready() -> void:
 	if auto_spawn:
-		spawn()
+		# Defer until after the scene's _ready propagation completes,
+		# otherwise `add_child` would race with the parent still being
+		# initialized.
+		spawn.call_deferred()
 
 func spawn() -> Vehicle:
 	if vehicle_scene == null:

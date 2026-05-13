@@ -4,12 +4,28 @@ class_name Checkpoint extends Area3D
 # Order checkpoints by setting `index` 0..N around the track; RaceManager
 # uses it to detect a completed lap.
 
+# Group all Checkpoints register themselves to so RaceManager can
+# auto-discover them. Kept on Checkpoint (not RaceManager) to avoid a
+# circular class reference.
+const GROUP := "checkpoints"
+
 @export var index: int = 0
+@export var visual_indicator: Node3D
 
 signal passed(vehicle: Vehicle, index: int)
 
 func _ready() -> void:
+
+	# Join the group so RaceManager can auto-discover us
+	# (RaceManager defers its own setup by one frame to allow this).
+	add_to_group(GROUP)
+
 	body_entered.connect(_on_body_entered)
+
+	# Hide the editor-only translucent box at runtime so players don't see it.
+
+	if visual_indicator != null:
+		visual_indicator.visible = false
 
 func _on_body_entered(body: Node) -> void:
 

@@ -7,6 +7,10 @@
 [ext_resource type="PackedScene" uid="uid://c44tfiddyjjm1" path="res://models/vehicle-truck-green.glb" id="9_cmq2j"]
 [ext_resource type="PackedScene" uid="uid://c5e64mpylh1ge" path="res://models/vehicle-truck-purple.glb" id="10_p3c1o"]
 [ext_resource type="PackedScene" uid="uid://b34e2pvbemfac" path="res://models/vehicle-truck-red.glb" id="11_wocnk"]
+[ext_resource type="PackedScene" uid="uid://bsppnt1k3c8as" path="res://scenes/spawn-point.tscn" id="12_spawn"]
+[ext_resource type="PackedScene" uid="uid://bchkpt1k3c8aq" path="res://scenes/checkpoint.tscn" id="13_check"]
+[ext_resource type="Script" uid="uid://bbkuilbmcmkgd" path="res://scripts/race-manager.gd" id="14_race"]
+[ext_resource type="Script" uid="uid://cb8d161gawxaw" path="res://scripts/main.gd" id="15_main"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_ya4ey"]
 size = Vector3(60, 0, 60)
@@ -16,6 +20,7 @@ friction = 0.0
 bounce = 0.1
 
 [node name="Main" type="Node3D" unique_id=1145999287]
+script = ExtResource("15_main")
 
 [node name="Environment" type="WorldEnvironment" parent="." unique_id=1097254880]
 environment = ExtResource("1_q4t1r")
@@ -25,10 +30,10 @@ environment = ExtResource("1_q4t1r")
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Plane" unique_id=1840952651]
 shape = SubResource("BoxShape3D_ya4ey")
 
-[node name="View" type="Node3D" parent="." unique_id=1807530472 node_paths=PackedStringArray("target")]
+[node name="View" type="Node3D" parent="." unique_id=1807530472 node_paths=PackedStringArray("spawn_point")]
 transform = Transform3D(0.707107, -0.40558, 0.579228, 0, 0.819152, 0.573576, -0.707107, -0.40558, 0.579228, 3.5, 0, 5)
 script = ExtResource("5_0lrhn")
-target = NodePath("../Vehicle")
+spawn_point = NodePath("../SpawnPoint")
 
 [node name="Camera" type="Camera3D" parent="View" unique_id=1079798936]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 16)
@@ -67,5 +72,25 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -23.7772, -0.143123, -13.5596
 [node name="vehicle-truck-red" parent="." unique_id=1524379599 instance=ExtResource("11_wocnk")]
 transform = Transform3D(-0.913034, 0, 0.407884, 0, 1, 0, -0.407884, 0, -0.913034, -1.36138, -0.148564, -23.8)
 
-[node name="Vehicle" parent="." unique_id=1867641805 instance=ExtResource("7_o6xl0")]
+[node name="SpawnPoint" parent="." unique_id=262618613 instance=ExtResource("12_spawn")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.5, 0, 5)
+vehicle_scene = ExtResource("7_o6xl0")
+
+[node name="Checkpoint0" parent="." unique_id=1625733379 instance=ExtResource("13_check")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 2, 4)
+
+[node name="Checkpoint1" parent="." unique_id=1354987746 instance=ExtResource("13_check")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -4, 2, -18.5)
+index = 1
+
+[node name="Checkpoint2" parent="." unique_id=2074861997 instance=ExtResource("13_check")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.5, 2, 4)
+index = 2
+
+[node name="RaceManager" type="Node" parent="." unique_id=2055409977]
+script = ExtResource("14_race")
+
+[connection signal="spawned" from="SpawnPoint" to="View" method="_on_spawned"]
+[connection signal="lap_completed" from="RaceManager" to="." method="_on_lap_completed"]
+[connection signal="race_started" from="RaceManager" to="." method="_on_race_started"]
+[connection signal="vehicle_finished" from="RaceManager" to="." method="_on_vehicle_finished"]

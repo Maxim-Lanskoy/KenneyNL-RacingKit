@@ -1,9 +1,15 @@
 class_name RaceManager extends Node
 
-# Tracks per-vehicle progress around an ordered list of checkpoints and
-# emits race events. Wire the scene's checkpoints into the `checkpoints`
-# array (sorted by their index). Vehicles are tracked the first time
-# they cross checkpoint 0.
+# Tracks per-vehicle progress around an ordered set of checkpoints and
+# emits race events.
+#
+# By default, all Checkpoint nodes in the scene are auto-discovered via
+# the "checkpoints" group (Checkpoint adds itself to the group on _ready)
+# and sorted by their `index` property. Drop a new Checkpoint into the
+# scene and it joins the race automatically.
+#
+# For multi-track or filtered setups, populate the `checkpoints` array
+# explicitly in the Inspector — when non-empty, it overrides discovery.
 
 @export var checkpoints: Array[Checkpoint] = []
 @export var total_laps: int = 3
@@ -13,13 +19,34 @@ signal lap_completed(vehicle: Vehicle, lap: int, time_seconds: float)
 signal vehicle_finished(vehicle: Vehicle, total_time_seconds: float)
 
 var _progress: Dictionary = {}
+var _active_checkpoints: Array[Checkpoint] = []
 
 func _ready() -> void:
-	for cp in checkpoints:
+	# Defer one frame so every Checkpoint has had its own _ready (and
+	# joined the group) before we discover and connect them.
+	_setup.call_deferred()
+
+func _setup() -> void:
+
+	_active_checkpoints = checkpoints if not checkpoints.is_empty() else _discover_checkpoints()
+	_active_checkpoints.sort_custom(func(a, b): return a.index < b.index)
+
+	for cp in _active_checkpoints:
 		cp.passed.connect(_on_checkpoint_passed)
+
 	race_started.emit()
 
+func _discover_checkpoints() -> Array[Checkpoint]:
+
+	var result: Array[Checkpoint] = []
+	for node in get_tree().get_nodes_in_group(Checkpoint.GROUP):
+		if node is Checkpoint:
+			result.append(node)
+	return result
+
 func _on_checkpoint_passed(vehicle: Vehicle, index: int) -> void:
+
+	if _active_checkpoints.is_empty(): return
 
 	if not _progress.has(vehicle):
 		var now := Time.get_ticks_msec()
@@ -34,7 +61,7 @@ func _on_checkpoint_passed(vehicle: Vehicle, index: int) -> void:
 	if index != p.next_index:
 		return # crossed out of order; ignore
 
-	p.next_index = (p.next_index + 1) % checkpoints.size()
+	p.next_index = (p.next_index + 1) % _active_checkpoints.size()
 
 	if p.next_index == 0:
 		var now := Time.get_ticks_msec()

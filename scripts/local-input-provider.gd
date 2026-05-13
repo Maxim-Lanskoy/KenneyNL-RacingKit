@@ -1,9 +1,9 @@
 class_name LocalInputProvider extends InputProvider
 
-# Reads InputMap actions. Set action_prefix to namespace per player
-# (e.g. "p1_" reads "p1_left"/"p1_right"/"p1_back"/"p1_forward")
-# without modifying this script. Empty prefix uses the default
-# "left"/"right"/"back"/"forward" actions.
+# Reads InputMap actions. The optional action_prefix is prepended to
+# each action name — useful if you want to drive this provider from a
+# differently-named action set without subclassing. Empty prefix (the
+# default) reads "left"/"right"/"back"/"forward".
 
 @export var action_prefix: String = ""
 

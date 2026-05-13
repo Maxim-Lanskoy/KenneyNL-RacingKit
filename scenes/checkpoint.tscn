@@ -5,8 +5,22 @@
 [sub_resource type="BoxShape3D" id="BoxShape_checkpoint"]
 size = Vector3(10, 5, 1)
 
-[node name="Checkpoint" type="Area3D"]
+[sub_resource type="BoxMesh" id="BoxMesh_checkpoint"]
+size = Vector3(10, 5, 1)
+
+[sub_resource type="StandardMaterial3D" id="Material_checkpoint"]
+transparency = 1
+shading_mode = 0
+albedo_color = Color(1, 0.9, 0.2, 0.25)
+
+[node name="Checkpoint" type="Area3D" node_paths=PackedStringArray("visual_indicator")]
+collision_mask = 8
 script = ExtResource("1_script")
+visual_indicator = NodePath("VisualIndicator")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 shape = SubResource("BoxShape_checkpoint")
+
+[node name="VisualIndicator" type="MeshInstance3D" parent="."]
+mesh = SubResource("BoxMesh_checkpoint")
+material_override = SubResource("Material_checkpoint")

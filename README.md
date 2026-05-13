@@ -56,17 +56,24 @@ For most vehicles you only need four files (two scripts, one model scene, one co
 
 Edit the matching `*-config.tres` resource in `scenes/` (e.g. `car-config.tres`, `motorcycle-config.tres`). Each resource exposes steering, acceleration, sphere coupling, and engine audio parameters that the rig reads every frame. Different configs per vehicle let a truck feel heavy and a motorcycle agile without forking scripts.
 
-#### 5. How to use a different input source (multiplayer, AI, networking)?
+#### 5. How to use a different input source (AI, networking)?
 
-`Vehicle.input_provider` accepts any node that extends `InputProvider`. The default `LocalInputProvider` reads `InputMap` actions and supports an `action_prefix` for multiple local players (e.g. set `"p2_"` to read `p2_left`/`p2_right`/`p2_back`/`p2_forward`). For AI or networked players, write a subclass overriding `get_steering()` and `get_throttle()`, and swap it in via the editor.
+`Vehicle.input_provider` accepts any node that extends `InputProvider`. The default `LocalInputProvider` reads `InputMap` actions (`left`/`right`/`back`/`forward` by default). For AI or networked players, write a subclass overriding `get_steering()` and `get_throttle()` and swap it in via the editor:
+
+- **AI** — compute steering/throttle from a target waypoint or path.
+- **Networked player** — return values replicated from the network layer (e.g. via `MultiplayerSynchronizer` on a state node).
+
+`LocalInputProvider` also exposes an optional `action_prefix` (defaults to empty) for namespacing — e.g. setting it to `"my_"` would read `my_left`/`my_right`/etc. — but you'd need to define those actions in `InputMap` yourself.
 
 #### 6. Race scaffold
 
 The kit ships with three building blocks for racing logic:
 
-- **`scenes/spawn-point.tscn`** — a `Marker3D` that instantiates a Vehicle scene at its transform. Set `vehicle_scene` in the editor and disable `auto_spawn` if you want a `RaceManager` to control timing.
-- **`scenes/checkpoint.tscn`** — an `Area3D` with a `BoxShape3D` trigger. Set `index` to order checkpoints around the track. Emits `passed(vehicle, index)`.
-- **`scripts/race-manager.gd`** — a `Node` that watches checkpoints, tracks per-vehicle lap progress, and emits `race_started`, `lap_completed(vehicle, lap, time)`, and `vehicle_finished(vehicle, total_time)`. Add it to your scene and wire its `checkpoints` array.
+- **`scenes/spawn-point.tscn`** — a `Marker3D` that instantiates a Vehicle scene at its transform. Set `vehicle_scene` in the editor. Auto-spawns on `_ready` (deferred to avoid `add_child` racing with parent setup); disable `auto_spawn` if you want a `RaceManager` or game state to trigger the spawn.
+- **`scenes/checkpoint.tscn`** — an `Area3D` trigger with a translucent yellow `VisualIndicator` box (visible only in the editor — hidden at runtime) so you can position and rotate trigger zones on the track at a glance. Set `index` to order checkpoints around the lap. Emits `passed(vehicle, index)`.
+- **`scripts/race-manager.gd`** — a `Node` that watches checkpoints, tracks per-vehicle lap progress, and emits `race_started`, `lap_completed(vehicle, lap, time)`, and `vehicle_finished(vehicle, total_time)`. **Auto-discovers** every `Checkpoint` in the scene by group lookup (`"checkpoints"`) and sorts them by `index` — drop a new Checkpoint anywhere, set its index, and it joins the race. The `checkpoints` `@export` array remains as an optional explicit override for multi-track scenes.
+
+`main.tscn` ships with a working demo: a `SpawnPoint` at the start line (the `View` camera latches onto the spawned vehicle via the `spawned` signal), three `Checkpoint` triggers around the GridMap track, and a `RaceManager` whose lap signals connect to print handlers in `scripts/main.gd` (`[Race] Started`, `[Race] Lap N completed in N.NNs`, `[Race] Finished in N.NNs`). Replace `main.gd` with your HUD / results-screen logic when forking. Spawning inside a checkpoint at race start is fine — `RaceManager`'s out-of-order check silently ignores the initial entry until the vehicle crosses checkpoint 0 in order.
 
 ### License
 
