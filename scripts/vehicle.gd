@@ -8,6 +8,9 @@ class_name Vehicle extends Node3D
 @export_category("Model")
 @export var model_scene: PackedScene
 
+@export_category("Input")
+@export var input_provider: InputProvider
+
 @export_category("Audio")
 @export var screech_sound: AudioStreamPlayer3D
 @export var engine_sound: AudioStreamPlayer3D
@@ -28,6 +31,7 @@ var prev_position: Vector3
 var calculated_lean: float
 
 var _model: VehicleModel
+var _config: VehicleConfig
 
 # Public Functions
 
@@ -39,9 +43,12 @@ func get_vehicle_position() -> Vector3:
 func _ready():
 
 	assert(model_scene != null, "Vehicle requires model_scene to be set")
+	assert(input_provider != null, "Vehicle requires input_provider to be set")
 
 	_model = model_scene.instantiate()
 	model_holder.add_child(_model)
+
+	_config = _model.config if _model.config != null else VehicleConfig.new()
 
 	engine_sound.stream = _model.engine_stream
 	engine_sound.play()
@@ -53,10 +60,10 @@ func _physics_process(delta):
 	var direction = sign(linear_speed)
 	if direction == 0: direction = sign(input.z) if abs(input.z) > 0.1 else 1
 
-	var steering_grip = clamp(abs(linear_speed), 0.2, 1.0)
+	var steering_grip = clamp(abs(linear_speed), _config.min_steering_grip, _config.max_steering_grip)
 
-	var target_angular = -input.x * steering_grip * 4 * direction
-	angular_speed = lerp(angular_speed, target_angular, delta * 4)
+	var target_angular = -input.x * steering_grip * _config.max_steering * direction
+	angular_speed = lerp(angular_speed, target_angular, delta * _config.steering_smoothing)
 
 	model_holder.rotate_y(angular_speed * delta)
 
@@ -78,18 +85,18 @@ func _physics_process(delta):
 	var target_speed = input.z
 
 	if (target_speed < 0 and linear_speed > 0.01):
-		linear_speed = lerp(linear_speed, 0.0, delta * 8)
+		linear_speed = lerp(linear_speed, 0.0, delta * _config.brake_rate)
 	else:
 		if (target_speed < 0):
-			linear_speed = lerp(linear_speed, target_speed / 2, delta * 2)
+			linear_speed = lerp(linear_speed, target_speed / 2, delta * _config.reverse_rate)
 		else:
-			linear_speed = lerp(linear_speed, target_speed, delta * 6)
+			linear_speed = lerp(linear_speed, target_speed, delta * _config.forward_rate)
 
-	acceleration = lerpf(acceleration, linear_speed + (abs(sphere.angular_velocity.length() * linear_speed) / 100), delta * 1)
+	acceleration = lerpf(acceleration, linear_speed + (abs(sphere.angular_velocity.length() * linear_speed) / 100), delta * _config.accel_smoothing)
 
 	# Match the pivot to the physics sphere
 
-	model_holder.position = sphere.position - Vector3(0, 0.65, 0)
+	model_holder.position = sphere.position - Vector3(0, _config.sphere_offset_y, 0)
 	raycast.position = sphere.position
 
 	linear_velocity = (model_holder.position - prev_position) / delta
@@ -103,13 +110,13 @@ func _physics_process(delta):
 	_model.update_pose(input, linear_speed, acceleration, calculated_lean, delta)
 	_effect_trails()
 
-# Handle input when vehicle is colliding with ground
+# Read steering/throttle from the wired input provider when grounded
 
 func _handle_input(delta):
 
 	if raycast.is_colliding():
-		input.x = Input.get_axis("left", "right")
-		input.z = Input.get_axis("back", "forward")
+		input.x = input_provider.get_steering()
+		input.z = input_provider.get_throttle()
 
 	sphere.angular_velocity += model_holder.get_global_transform().basis.x * (linear_speed * 100) * delta
 
@@ -120,10 +127,10 @@ func _effect_engine(delta):
 	var speed_factor = clamp(abs(linear_speed), 0.0, 1.0)
 	var throttle_factor = clamp(abs(input.z), 0.0, 1.0)
 
-	var target_volume = remap(speed_factor + (throttle_factor * 0.5), 0.0, 1.5, -15.0, -5.0)
+	var target_volume = remap(speed_factor + (throttle_factor * 0.5), 0.0, 1.5, _config.engine_volume_min, _config.engine_volume_max)
 	engine_sound.volume_db = lerp(engine_sound.volume_db, target_volume, delta * 5.0)
 
-	var target_pitch = remap(speed_factor, 0.0, 1.0, 0.5, 3)
+	var target_pitch = remap(speed_factor, 0.0, 1.0, _config.engine_pitch_min, _config.engine_pitch_max)
 	if throttle_factor > 0.1: target_pitch += 0.2
 
 	engine_sound.pitch_scale = lerp(engine_sound.pitch_scale, target_pitch, delta * 2.0)

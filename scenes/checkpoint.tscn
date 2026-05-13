@@ -1,0 +1,12 @@
+[gd_scene format=3 uid="uid://bchkpt1k3c8aq"]
+
+[ext_resource type="Script" path="res://scripts/checkpoint.gd" id="1_script"]
+
+[sub_resource type="BoxShape3D" id="BoxShape_checkpoint"]
+size = Vector3(10, 5, 1)
+
+[node name="Checkpoint" type="Area3D"]
+script = ExtResource("1_script")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("BoxShape_checkpoint")

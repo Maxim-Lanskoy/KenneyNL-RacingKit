@@ -7,6 +7,7 @@ class_name VehicleModel extends Node3D
 
 @export var body: Node3D
 @export var engine_stream: AudioStream
+@export var config: VehicleConfig
 
 @export_group("Trails")
 @export var trail_left: GPUParticles3D

@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="VehicleConfig" format=3 uid="uid://bmotocfg12345"]
+
+[ext_resource type="Script" path="res://scripts/vehicle-config.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+max_steering = 5.0
+steering_smoothing = 5.0
+min_steering_grip = 0.25
+max_steering_grip = 1.0
+forward_rate = 7.0
+reverse_rate = 2.0
+brake_rate = 8.0
+accel_smoothing = 1.0
+sphere_offset_y = 0.65
+engine_pitch_min = 0.6
+engine_pitch_max = 3.5
+engine_volume_min = -15.0
+engine_volume_max = -5.0

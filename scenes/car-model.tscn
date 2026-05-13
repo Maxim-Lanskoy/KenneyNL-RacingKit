@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" uid="uid://dyigra5crnov4" path="res://scenes/antenna.tscn" id="4_antenna"]
 [ext_resource type="StandardMaterial3D" uid="uid://btrl1mat2sm3k" path="res://scenes/trail-smoke-material.tres" id="5_trailmat"]
 [ext_resource type="ParticleProcessMaterial" uid="uid://btrl4prc5mat6" path="res://scenes/trail-process-material.tres" id="6_trailproc"]
+[ext_resource type="Resource" uid="uid://bcarcfg123456" path="res://scenes/car-config.tres" id="7_config"]
 
 [sub_resource type="QuadMesh" id="QuadMesh_trail"]
 
@@ -13,6 +14,7 @@
 script = ExtResource("1_script")
 body = NodePath("Mesh/body")
 engine_stream = ExtResource("3_engine")
+config = ExtResource("7_config")
 trail_left = NodePath("TrailLeft")
 trail_right = NodePath("TrailRight")
 wheel_fl = NodePath("Mesh/wheel-front-left")
