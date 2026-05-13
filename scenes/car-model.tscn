@@ -1,0 +1,48 @@
+[gd_scene format=3 uid="uid://bcarm0del1234"]
+
+[ext_resource type="Script" path="res://scripts/car-model.gd" id="1_script"]
+[ext_resource type="PackedScene" uid="uid://bynb5jk1d478y" path="res://models/vehicle-truck-yellow.glb" id="2_mesh"]
+[ext_resource type="AudioStream" uid="uid://j6x2is8pyt8y" path="res://audio/engine.ogg" id="3_engine"]
+[ext_resource type="PackedScene" uid="uid://dyigra5crnov4" path="res://scenes/antenna.tscn" id="4_antenna"]
+[ext_resource type="StandardMaterial3D" uid="uid://btrl1mat2sm3k" path="res://scenes/trail-smoke-material.tres" id="5_trailmat"]
+[ext_resource type="ParticleProcessMaterial" uid="uid://btrl4prc5mat6" path="res://scenes/trail-process-material.tres" id="6_trailproc"]
+
+[sub_resource type="QuadMesh" id="QuadMesh_trail"]
+
+[node name="CarModel" type="Node3D" node_paths=PackedStringArray("body", "trail_left", "trail_right", "wheel_fl", "wheel_fr", "wheel_bl", "wheel_br")]
+script = ExtResource("1_script")
+body = NodePath("Mesh/body")
+engine_stream = ExtResource("3_engine")
+trail_left = NodePath("TrailLeft")
+trail_right = NodePath("TrailRight")
+wheel_fl = NodePath("Mesh/wheel-front-left")
+wheel_fr = NodePath("Mesh/wheel-front-right")
+wheel_bl = NodePath("Mesh/wheel-back-left")
+wheel_br = NodePath("Mesh/wheel-back-right")
+
+[node name="Mesh" parent="." instance=ExtResource("2_mesh")]
+
+[node name="Antenna" parent="Mesh" instance=ExtResource("4_antenna")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.1547786, 0.39122286, -0.5406047)
+
+[node name="TrailLeft" type="GPUParticles3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.25, 0.05, -0.35)
+material_override = ExtResource("5_trailmat")
+cast_shadow = 0
+amount = 32
+lifetime = 0.5
+fixed_fps = 60
+process_material = ExtResource("6_trailproc")
+draw_pass_1 = SubResource("QuadMesh_trail")
+
+[node name="TrailRight" type="GPUParticles3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.25, 0.05, -0.35)
+material_override = ExtResource("5_trailmat")
+cast_shadow = 0
+amount = 32
+lifetime = 0.5
+fixed_fps = 60
+process_material = ExtResource("6_trailproc")
+draw_pass_1 = SubResource("QuadMesh_trail")
+
+[editable path="Mesh"]
