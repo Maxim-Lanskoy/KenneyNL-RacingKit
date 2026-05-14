@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="AIProfile" format=3 uid="uid://baieasyprof01"]
+
+[ext_resource type="Script" path="res://scripts/ai-profile.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+lookahead = 7.0
+steering_softness = 3.5
+target_throttle = 0.6
+corner_brake_threshold = 0.15
+min_corner_throttle = 0.22

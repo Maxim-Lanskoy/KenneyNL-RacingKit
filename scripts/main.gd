@@ -7,8 +7,8 @@ extends Node3D
 func _on_race_started() -> void:
 	print("[Race] Started")
 
-func _on_lap_completed(_vehicle: Vehicle, lap: int, time_seconds: float) -> void:
-	print("[Race] Lap %d completed in %.2fs" % [lap, time_seconds])
+func _on_lap_completed(vehicle: Vehicle, lap: int, time_seconds: float) -> void:
+	print("[Race] %s lap %d in %.2fs" % [vehicle.name, lap, time_seconds])
 
-func _on_vehicle_finished(_vehicle: Vehicle, total_time_seconds: float) -> void:
-	print("[Race] Finished in %.2fs" % total_time_seconds)
+func _on_vehicle_finished(vehicle: Vehicle, total_time_seconds: float) -> void:
+	print("[Race] %s finished in %.2fs" % [vehicle.name, total_time_seconds])

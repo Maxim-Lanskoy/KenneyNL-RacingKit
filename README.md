@@ -60,7 +60,7 @@ Edit the matching `*-config.tres` resource in `scenes/` (e.g. `car-config.tres`,
 
 `Vehicle.input_provider` accepts any node that extends `InputProvider`. The default `LocalInputProvider` reads `InputMap` actions (`left`/`right`/`back`/`forward` by default). For AI or networked players, write a subclass overriding `get_steering()` and `get_throttle()` and swap it in via the editor:
 
-- **AI** — compute steering/throttle from a target waypoint or path.
+- **AI** — see the bundled `AIInputProvider` + `AISpawner` (section 7 below) for the kit's pure-pursuit implementation, or subclass `InputProvider` for your own.
 - **Networked player** — return values replicated from the network layer (e.g. via `MultiplayerSynchronizer` on a state node).
 
 `LocalInputProvider` also exposes an optional `action_prefix` (defaults to empty) for namespacing — e.g. setting it to `"my_"` would read `my_left`/`my_right`/etc. — but you'd need to define those actions in `InputMap` yourself.
@@ -73,7 +73,48 @@ The kit ships with three building blocks for racing logic:
 - **`scenes/checkpoint.tscn`** — an `Area3D` trigger with a translucent yellow `VisualIndicator` box (visible only in the editor — hidden at runtime) so you can position and rotate trigger zones on the track at a glance. Set `index` to order checkpoints around the lap. Emits `passed(vehicle, index)`.
 - **`scripts/race-manager.gd`** — a `Node` that watches checkpoints, tracks per-vehicle lap progress, and emits `race_started`, `lap_completed(vehicle, lap, time)`, and `vehicle_finished(vehicle, total_time)`. **Auto-discovers** every `Checkpoint` in the scene by group lookup (`"checkpoints"`) and sorts them by `index` — drop a new Checkpoint anywhere, set its index, and it joins the race. The `checkpoints` `@export` array remains as an optional explicit override for multi-track scenes.
 
-`main.tscn` ships with a working demo: a `SpawnPoint` at the start line (the `View` camera latches onto the spawned vehicle via the `spawned` signal), three `Checkpoint` triggers around the GridMap track, and a `RaceManager` whose lap signals connect to print handlers in `scripts/main.gd` (`[Race] Started`, `[Race] Lap N completed in N.NNs`, `[Race] Finished in N.NNs`). Replace `main.gd` with your HUD / results-screen logic when forking. Spawning inside a checkpoint at race start is fine — `RaceManager`'s out-of-order check silently ignores the initial entry until the vehicle crosses checkpoint 0 in order.
+`main.tscn` ships with a working demo: a `SpawnPoint` at the start line (the `View` camera latches onto the spawned vehicle via the `spawned` signal), three `Checkpoint` triggers around the GridMap track, and a `RaceManager` whose lap signals connect to print handlers in `scripts/main.gd` (`[Race] Started`, `[Race] <vehicle_name> lap N in N.NNs`, `[Race] <vehicle_name> finished in N.NNs`). Replace `main.gd` with your HUD / results-screen logic when forking. Spawning inside a checkpoint at race start is fine — `RaceManager`'s out-of-order check silently ignores the initial entry until the vehicle crosses checkpoint 0 in order.
+
+#### 7. Adding AI opponents
+
+The kit ships with a `Path3D` + `AISpawner` pair that drops N AI-driven cars onto a racing line of your choosing. Each AI is a regular `vehicle.tscn` instance — same sphere physics, same model adapter (wheels spin, trails emit when drifting, engine plays, sphere collides with the player) — with its `LocalInputProvider` swapped for an `AIInputProvider`.
+
+- **`scripts/ai-input-provider.gd`** — Pure-pursuit driver. Each physics frame projects the host vehicle onto the path, samples a lookahead point farther along the curve, and produces steering / throttle to aim at it. Throttle is reduced through tight corners so the sphere doesn't drift through the wall.
+- **`scenes/ai-spawner.tscn` + `scripts/ai-spawner.gd`** — `Marker3D` that instantiates `count` vehicles evenly spaced along the path and swaps in the AI provider. Deferred spawn (one frame) so `add_child` doesn't race the parent scene's setup. `count = 0` is valid — nothing spawns, no errors.
+
+To add AI to a track:
+
+1. Drop a `Path3D` into the scene and draw a **closed** racing line (set `curve.closed = true` so AI laps endlessly). AI travels in the curve's drawing direction (increasing baked offset) — if the AI runs the wrong way around your track, reverse the curve point order in the editor.
+2. Drop an `AISpawner` near the start. In the Inspector wire:
+   - `vehicle_scene` → `scenes/vehicle.tscn`
+   - `ai_model_scene` → a model scene (e.g. `scenes/car-model.tscn`). Optional; if left empty, AI uses the vehicle's default model.
+   - `path` → your `Path3D`
+   - `profile` → a difficulty preset (see below). Optional; if left empty, AI uses Normal defaults.
+3. Set `count` and run.
+
+The AI path is **independent of `Checkpoint`s** — Path3D is the racing line, Checkpoints are lap detectors. AI cars do trip Checkpoints though, so their laps appear in `main.gd`'s race log alongside the player's (prefixed by vehicle name, e.g. `[Race] AIVehicle_0 lap 1 in 23.45s`). Filter by vehicle name or group if you want player-only events.
+
+##### Difficulty profiles
+
+AI tuning lives in an **`AIProfile`** resource (`scripts/ai-profile.gd`) — a named bundle of five knobs, the same pattern as `VehicleConfig` for vehicle handling. The kit ships three presets in `scenes/`:
+
+| Preset | Feel | Key differences |
+|---|---|---|
+| `ai-easy.tres` | Slow, cautious, beatable | Low `target_throttle` (0.6), short `lookahead` (7 — reacts late) |
+| `ai-normal.tres` | Balanced | The tuned baseline values |
+| `ai-hard.tres` | Fast, looks far ahead, carries corner speed | High `target_throttle` (0.95), long `lookahead` (12), higher `min_corner_throttle` |
+
+Wire one into `AISpawner.profile` to set the difficulty for every car that spawner produces. For a mixed field, use multiple `AISpawner`s with different profiles. To make your own, duplicate a `.tres` and edit:
+
+| Parameter | What it does |
+|---|---|
+| `lookahead` | How far ahead on the curve the AI aims, in meters. Higher = earlier reactions; too far cuts the apex. |
+| `steering_softness` | Larger = gentler steering for the same lateral error. Too small and the AI oscillates on straights. |
+| `target_throttle` | Cruise throttle on straights, in `[0, 1]`. |
+| `corner_brake_threshold` | Steering magnitude at which braking begins. Lower = AI brakes earlier into corners. |
+| `min_corner_throttle` | Floor throttle through the tightest corners. |
+
+If AI clips inside walls on tight turns, lower `target_throttle` or `min_corner_throttle`. If AI reacts too late, raise `lookahead`. If AI oscillates on straights, raise `steering_softness`.
 
 ### License
 

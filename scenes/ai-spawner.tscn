@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://baispwn1k3c8a"]
+
+[ext_resource type="Script" path="res://scripts/ai-spawner.gd" id="1_script"]
+
+[node name="AISpawner" type="Marker3D"]
+script = ExtResource("1_script")
