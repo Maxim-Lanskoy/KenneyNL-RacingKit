@@ -1,11 +1,15 @@
 [gd_resource type="Resource" script_class="AIProfile" format=3 uid="uid://baihardprof01"]
 
-[ext_resource type="Script" path="res://scripts/ai-profile.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://bkyd5uhkxyqlu" path="res://scripts/ai-profile.gd" id="1_script"]
 
 [resource]
 script = ExtResource("1_script")
 lookahead = 12.0
-steering_softness = 3.0
 target_throttle = 0.95
 corner_brake_threshold = 0.22
 min_corner_throttle = 0.32
+hit_recovery_time = 0.3
+hit_recovery_steering = 0.3
+hit_lateral_impulse = 1.5
+max_lateral_offset = 3.0
+lateral_recenter_rate = 2.5

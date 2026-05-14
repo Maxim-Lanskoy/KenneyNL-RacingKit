@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="AIProfile" format=3 uid="uid://baieasyprof01"]
 
-[ext_resource type="Script" path="res://scripts/ai-profile.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://bkyd5uhkxyqlu" path="res://scripts/ai-profile.gd" id="1_script"]
 
 [resource]
 script = ExtResource("1_script")
@@ -9,3 +9,8 @@ steering_softness = 3.5
 target_throttle = 0.6
 corner_brake_threshold = 0.15
 min_corner_throttle = 0.22
+hit_recovery_time = 0.8
+hit_recovery_steering = 0.1
+hit_lateral_impulse = 3.5
+max_lateral_offset = 5.0
+lateral_recenter_rate = 1.0

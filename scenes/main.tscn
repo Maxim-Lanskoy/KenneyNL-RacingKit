@@ -9,7 +9,7 @@
 [ext_resource type="PackedScene" uid="uid://b34e2pvbemfac" path="res://models/vehicle-truck-red.glb" id="11_wocnk"]
 [ext_resource type="PackedScene" uid="uid://bsppnt1k3c8as" path="res://scenes/spawn-point.tscn" id="12_spawn"]
 [ext_resource type="PackedScene" uid="uid://bchkpt1k3c8aq" path="res://scenes/checkpoint.tscn" id="13_check"]
-[ext_resource type="Resource" uid="uid://baieasyprof01" path="res://scenes/ai-easy.tres" id="14_a8y0u"]
+[ext_resource type="Resource" uid="uid://baihardprof01" path="res://scenes/ai-hard.tres" id="14_a8y0u"]
 [ext_resource type="Script" uid="uid://bbkuilbmcmkgd" path="res://scripts/race-manager.gd" id="14_race"]
 [ext_resource type="Script" uid="uid://cb8d161gawxaw" path="res://scripts/main.gd" id="15_main"]
 [ext_resource type="PackedScene" uid="uid://baispwn1k3c8a" path="res://scenes/ai-spawner.tscn" id="16_aispwn"]

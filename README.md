@@ -116,6 +116,23 @@ Wire one into `AISpawner.profile` to set the difficulty for every car that spawn
 
 If AI clips inside walls on tight turns, lower `target_throttle` or `min_corner_throttle`. If AI reacts too late, raise `lookahead`. If AI oscillates on straights, raise `steering_softness`.
 
+##### Hit reactions
+
+AI cars run real sphere physics, so the player can bump them — but the pure-pursuit controller corrects so fast the hit is invisible. To make collisions *land*, `AIInputProvider` connects to its vehicle's sphere `body_entered`: when another vehicle hits it, two things happen for a moment:
+
+- **Recovery stun** — steering authority drops (`hit_recovery_steering`) for `hit_recovery_time` seconds, so the impact's momentum actually carries the car off-line instead of being instantly cancelled. Throttle still brakes for corners — the car slows but can't correct.
+- **Lateral shove** — the pursued racing line itself is shoved sideways (`hit_lateral_impulse`, clamped to `max_lateral_offset`), away from the impact. So even after the stun ends the car drives a *wider line* for a while, then drifts back at `lateral_recenter_rate`.
+
+These are also `AIProfile` fields, so difficulty shapes how bulliable a car is — `ai-easy.tres` gets shoved far and recovers slowly, `ai-hard.tres` barely flinches.
+
+| Parameter | What it does |
+|---|---|
+| `hit_recovery_time` | Seconds the controller stays limp after a vehicle hit. |
+| `hit_recovery_steering` | Steering authority during recovery (`0` = can't steer, `1` = full). |
+| `hit_lateral_impulse` | How far sideways (meters) a hit shoves the pursued racing line. |
+| `max_lateral_offset` | Ceiling on the lateral offset, so repeated hits can't send a car miles wide. |
+| `lateral_recenter_rate` | How fast (meters/sec) the lateral offset decays back to the racing line. |
+
 ### License
 
 MIT License

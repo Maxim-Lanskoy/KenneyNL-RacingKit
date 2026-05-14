@@ -24,3 +24,16 @@ class_name AIProfile extends Resource
 @export var corner_brake_threshold: float = 0.18
 # Floor throttle through the tightest corners.
 @export var min_corner_throttle: float = 0.25
+
+@export_group("Hit Reaction")
+# Seconds the controller stays limp after hitting another vehicle, so the
+# impact's momentum actually shoves the car off-line before it corrects.
+@export var hit_recovery_time: float = 0.5
+# Steering authority during recovery (0 = can't steer, 1 = full control).
+@export var hit_recovery_steering: float = 0.15
+# How far sideways (meters) a hit shoves the pursued racing line.
+@export var hit_lateral_impulse: float = 2.5
+# Ceiling on the lateral offset so repeated hits can't send a car miles wide.
+@export var max_lateral_offset: float = 4.0
+# How fast (meters/sec) the lateral offset decays back to the racing line.
+@export var lateral_recenter_rate: float = 1.5
