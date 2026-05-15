@@ -61,16 +61,6 @@ func _spawn_one(spawn_world: Vector3, forward_world: Vector3, index: int) -> voi
 	if ai_model_scene != null:
 		vehicle.model_scene = ai_model_scene
 
-	# Build a transform whose local +Z (the asset's nose direction in
-	# kit convention) aligns with the path tangent; Y stays world-up.
-	var up := Vector3.UP
-	var fwd := forward_world
-	if absf(fwd.dot(up)) > 0.99:
-		fwd = Vector3.FORWARD
-	var x_axis: Vector3 = up.cross(fwd).normalized()
-	var spawn_basis := Basis(x_axis, up, fwd).orthonormalized()
-	vehicle.transform = Transform3D(spawn_basis, spawn_world)
-
 	# Swap the kit's LocalInputProvider for an AI provider BEFORE the
 	# vehicle enters the tree, so the kit's `assert(input_provider)` in
 	# Vehicle._ready sees the AI provider on first frame.
@@ -87,6 +77,19 @@ func _spawn_one(spawn_world: Vector3, forward_world: Vector3, index: int) -> voi
 	vehicle.input_provider = ai
 
 	get_tree().current_scene.add_child(vehicle)
+
+	# Orient the spawn so the asset's nose (kit convention: local +Z) faces
+	# along the path tangent; Y stays world-up. Set as global_transform
+	# after add_child — the proven SpawnPoint pattern — so it's independent
+	# of the scene root's own transform.
+	var up := Vector3.UP
+	var fwd := forward_world
+	if absf(fwd.dot(up)) > 0.99:
+		fwd = Vector3.FORWARD
+	var x_axis: Vector3 = up.cross(fwd).normalized()
+	var spawn_basis := Basis(x_axis, up, fwd).orthonormalized()
+	vehicle.global_transform = Transform3D(spawn_basis, spawn_world)
+
 	_spawned.append(vehicle)
 
 func get_spawned() -> Array[Vehicle]:

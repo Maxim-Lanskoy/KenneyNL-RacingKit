@@ -37,3 +37,13 @@ class_name AIProfile extends Resource
 @export var max_lateral_offset: float = 4.0
 # How fast (meters/sec) the lateral offset decays back to the racing line.
 @export var lateral_recenter_rate: float = 1.5
+
+@export_group("Obstacle Avoidance")
+# Length of the three forward feeler rays, meters. Longer = spots walls
+# and other cars from farther away.
+@export var avoidance_ray_length: float = 4.0
+# Steering bias applied when a side feeler is blocked (pushes away from it).
+@export var avoidance_strength: float = 0.6
+# Throttle cap while the centre feeler is blocked — eases off so the
+# steering bias has time to clear the obstacle.
+@export var avoidance_throttle: float = 0.4

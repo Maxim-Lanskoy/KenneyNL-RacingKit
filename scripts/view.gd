@@ -10,7 +10,7 @@ class_name View extends Node3D
 
 func _physics_process(delta):
 
-	if target == null: return
+	if not is_instance_valid(target): return
 
 	# Ease position towards target vehicle position
 

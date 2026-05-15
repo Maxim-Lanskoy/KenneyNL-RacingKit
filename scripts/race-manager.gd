@@ -55,6 +55,7 @@ func _on_checkpoint_passed(vehicle: Vehicle, index: int) -> void:
 			"lap": 0,
 			"lap_start_ms": now,
 			"race_start_ms": now,
+			"finished": false,
 		}
 
 	var p: Dictionary = _progress[vehicle]
@@ -70,6 +71,9 @@ func _on_checkpoint_passed(vehicle: Vehicle, index: int) -> void:
 		lap_completed.emit(vehicle, p.lap, lap_seconds)
 		p.lap_start_ms = now
 
-		if p.lap >= total_laps:
+		if p.lap >= total_laps and not p.finished:
+			# `lap_completed` keeps firing for as long as the vehicle laps,
+			# but "finished" is a one-time event — the flag gates the re-emit.
+			p.finished = true
 			var total_seconds: float = (now - int(p.race_start_ms)) / 1000.0
 			vehicle_finished.emit(vehicle, total_seconds)

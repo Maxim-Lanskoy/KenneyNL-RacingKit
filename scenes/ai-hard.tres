@@ -13,3 +13,5 @@ hit_recovery_steering = 0.3
 hit_lateral_impulse = 1.5
 max_lateral_offset = 3.0
 lateral_recenter_rate = 2.5
+avoidance_ray_length = 5.0
+avoidance_strength = 0.7

@@ -1,5 +1,12 @@
 class_name Vehicle extends Node3D
 
+# A fast-spinning physics sphere pressed against a wall or another sphere
+# converts its spin into a vertical climb via contact friction. While
+# grounded, upward velocity is capped to this fraction of horizontal speed
+# (0.5 ≈ a 27° climb). Lower it if cars still ride up walls; raise it if a
+# steep track needs the vehicle to climb faster than this.
+const MAX_CLIMB_RATIO := 0.15
+
 @export_category("Nodes")
 @export var sphere: RigidBody3D
 @export var raycast: RayCast3D
@@ -56,6 +63,18 @@ func _ready():
 func _physics_process(delta):
 
 	_handle_input(delta)
+
+	# Suppress wall / sphere climbing: a fast-spinning sphere converts its
+	# spin into a vertical climb via contact friction. While grounded, cap
+	# upward velocity to a fraction of horizontal speed — a car driving up a
+	# slope keeps its climb; a car stuck against a wall (≈ zero horizontal
+	# speed) cannot rise.
+	if raycast.is_colliding():
+		var v := sphere.linear_velocity
+		if v.y > 0.0:
+			var horizontal := Vector2(v.x, v.z).length()
+			v.y = minf(v.y, horizontal * MAX_CLIMB_RATIO)
+			sphere.linear_velocity = v
 
 	var direction = sign(linear_speed)
 	if direction == 0: direction = sign(input.z) if abs(input.z) > 0.1 else 1
